@@ -3,6 +3,12 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 
 export default function HomePage() {
+  const breedImages = {
+  "เปอร์เซีย": "/catfood/images/per.png",
+  "บริติชช็อตแฮร์": "/catfood/images/bri.png",
+  "เมนคูน": "/catfood/images/men.png",
+};
+
   const [toast, setToast] = useState(null);
   const [products, setProducts] = useState([]);
   const [breedGroups, setBreedGroups] = useState({});
@@ -143,14 +149,15 @@ useEffect(() => {
                 <div
                   className="absolute inset-0 bg-cover bg-center"
                   style={{
-                    backgroundImage: `url('/catfood/breeds/${breed}.jpg')`,
+backgroundImage: `url('${breedImages[breed] || "/catfood/images/default.png"}')`,
                   }}
+
                 />
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
 
                 <div className="absolute bottom-4 left-4 text-white drop-shadow-xl">
-                  <h3 className="text-2xl font-bold capitalize">{breed}</h3>
+<h3 className="text-xl font-semibold capitalize tracking-wide drop-shadow">{breed}</h3>
                   <p className="text-sm opacity-90">ดูสินค้า →</p>
                 </div>
               </Link>
@@ -182,13 +189,13 @@ function HomeSection({ title, subtitle, link, children }) {
       {/* HEADER */}
       <div className="mb-10">
         <div className="flex justify-between items-end">
-          <div>
-            <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+          <div> 
+<h2 className="text-3xl font-bold text-gray-900 tracking-tight">
               {title}
             </h2>
 
             {subtitle && (
-              <p className="text-gray-500 text-lg mt-1">
+<p className="text-gray-500 text-base mt-1">
                 {subtitle}
               </p>
             )}
@@ -197,14 +204,14 @@ function HomeSection({ title, subtitle, link, children }) {
           {link && (
             <Link
               to={link}
-              className="text-red-600 font-semibold hover:underline text-lg"
+className="text-red-600 text-base font-medium hover:text-red-700 transition"
             >
               ดูทั้งหมด →
             </Link>
           )}
         </div>
 
-        <div className="mt-4 h-[3px] w-20 bg-red-600 rounded-full"></div>
+<div className="mt-3 h-[2px] w-16 bg-red-500 rounded-full"></div>
       </div>
 
       {children}
@@ -232,7 +239,7 @@ function HorizontalScroll({ products, addToCart }) {
         onClick={() => scroll("left")}
         className="
           absolute left-3 top-1/2 -translate-y-1/2
-          bg-white/90 backdrop-blur-sm text-gray-700
+          bg-white/80 backdrop-blur-md text-gray-700
           p-2 rounded-full shadow
           opacity-0 group-hover:opacity-100
           hover:bg-red-50 transition
@@ -298,7 +305,7 @@ function PremiumProductCard({ product, addToCart }) {
       <div className="p-4 flex flex-col flex-1">
 
         {/* ⭐ ชื่อ + น้ำหนัก ระยะห่างกำลังดี อ่านง่าย */}
-        <h3 className="font-semibold text-lg text-gray-900 leading-relaxed mt-3 mb-3">
+<h3 className="font-semibold text-base text-gray-900 leading-snug mt-3 mb-2">
           {product.name}{" "}
           <span className="font-semibold text-gray-900">
             {product.weight}
@@ -306,7 +313,7 @@ function PremiumProductCard({ product, addToCart }) {
         </h3>
 
         {/* ราคา */}
-        <p className="text-red-600 font-bold text-xl mb-5">
+<p className="text-red-600 font-bold text-lg mb-4">
           {product.price} ฿
         </p>
 

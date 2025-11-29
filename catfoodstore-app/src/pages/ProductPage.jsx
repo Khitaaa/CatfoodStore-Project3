@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";   // ⭐ เพิ่ม useLocation
+import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 
 export default function ProductListPage() {
-  const location = useLocation(); // ⭐ อ่าน query string
+  const location = useLocation();
 
   const [filters, setFilters] = useState({
     type: "",
@@ -21,7 +21,7 @@ export default function ProductListPage() {
   const [openHealth, setOpenHealth] = useState(true);
   const [openBreed, setOpenBreed] = useState(true);
 
-  /* ⭐ อ่านค่าจาก URL เช่น /products?breed=เปอร์เซีย */
+  /* ⭐ อ่าน query string */
   useEffect(() => {
     const params = new URLSearchParams(location.search);
 
@@ -37,7 +37,7 @@ export default function ProductListPage() {
     }));
   }, [location.search]);
 
-  /* ===================== LOAD PRODUCTS ===================== */
+  /* ⭐ โหลดสินค้า */
   useEffect(() => {
     const load = async () => {
       try {
@@ -60,7 +60,7 @@ export default function ProductListPage() {
     load();
   }, []);
 
-  /* ===================== DYNAMIC BREED OPTIONS ===================== */
+  /* ⭐ Dynamic breed options */
   const breedOptions = React.useMemo(() => {
     const set = new Set();
     allProducts.forEach((p) => {
@@ -69,7 +69,7 @@ export default function ProductListPage() {
     return [...set].map((b) => ({ label: b, value: b }));
   }, [allProducts]);
 
-  /* ===================== DYNAMIC SPECIAL CARE OPTIONS ===================== */
+  /* ⭐ Dynamic special care options */
   const specialCareOptions = React.useMemo(() => {
     const set = new Set();
     allProducts.forEach((p) => {
@@ -84,14 +84,14 @@ export default function ProductListPage() {
     }));
   }, [allProducts]);
 
-  /* ===================== AGE OPTIONS ===================== */
+  /* ⭐ Age options */
   const ageOptions = [
     { label: "ลูกแมว", value: "kitten" },
     { label: "แมวโต", value: "adult" },
     { label: "แมวสูงอายุ", value: "senior" },
   ];
 
-  /* ===================== ADD TO CART ===================== */
+  /* ⭐ Add to cart */
   const addToCart = (product) => {
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     const idx = cart.findIndex((i) => i.id === product.id);
@@ -106,7 +106,7 @@ export default function ProductListPage() {
     setTimeout(() => setToast(null), 2000);
   };
 
-  /* ===================== CHECKBOX TOGGLE ===================== */
+  /* ⭐ Toggle checkbox */
   const toggleCheckbox = (group, value) => {
     setFilters((prev) => {
       const set = new Set(prev[group]);
@@ -115,7 +115,7 @@ export default function ProductListPage() {
     });
   };
 
-  /* ===================== FILTER LOGIC ===================== */
+  /* ⭐ FILTER LOGIC */
   useEffect(() => {
     let result = allProducts;
 
@@ -157,20 +157,20 @@ export default function ProductListPage() {
     <div className="max-w-7xl mx-auto px-6 py-8">
 
       {/* PAGE TITLE */}
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+      <h1 className="text-2xl font-semibold text-gray-900 mb-4">
         {filters.type === "" && "สินค้าทั้งหมด"}
         {filters.type === "dry" && "อาหารเม็ดสำหรับแมว"}
         {filters.type === "wet" && "อาหารเปียกสำหรับแมว"}
         {filters.type === "snack" && "ขนมสำหรับแมว"}
       </h1>
 
-      <p className="text-lg font-medium text-gray-700 mb-3">
+      <p className="text-base font-medium text-gray-700 mb-2">
         เลือกหมวดหมู่สินค้า
       </p>
 
       {/* CATEGORY + SORT */}
       <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
-        <div className="flex gap-4 flex-wrap">
+        <div className="flex gap-3 flex-wrap">
           {[
             { label: "ทั้งหมด", value: "" },
             { label: "อาหารเม็ด", value: "dry" },
@@ -181,10 +181,10 @@ export default function ProductListPage() {
               key={c.value}
               onClick={() => setFilters((prev) => ({ ...prev, type: c.value }))}
               className={`
-                px-8 py-3 rounded-full text-lg font-semibold transition
+                px-6 py-2.5 rounded-full text-base font-medium transition
                 ${
                   filters.type === c.value
-                    ? "bg-red-600 text-white shadow-lg"
+                    ? "bg-red-600 text-white shadow-md"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }
               `}
@@ -208,11 +208,11 @@ export default function ProductListPage() {
         {/* SIDEBAR */}
         <aside className="md:col-span-1 bg-white border rounded-xl shadow-sm p-6 h-fit">
 
-          <div className="flex justify-between mb-4">
-            <h2 className="text-xl font-bold">ตัวกรองสินค้า</h2>
+          <div className="flex justify-between mb-3">
+            <h2 className="text-lg font-semibold">ตัวกรองสินค้า</h2>
             <button
               onClick={resetFilters}
-              className="text-sm text-red-600 hover:underline"
+              className="text-sm text-red-600 hover:text-red-700 transition"
             >
               ล้างทั้งหมด
             </button>
@@ -284,8 +284,8 @@ function Collapse({ title, open, setOpen, children }) {
         onClick={() => setOpen(!open)}
         className="flex justify-between items-center w-full pb-2"
       >
-        <h3 className="font-semibold text-lg text-gray-900">{title}</h3>
-        <span className="text-gray-500 text-xl mx-auto">
+        <h3 className="font-medium text-base text-gray-900">{title}</h3>
+        <span className="text-gray-400 text-lg">
           {open ? "﹀" : "〉"}
         </span>
       </button>
@@ -334,30 +334,26 @@ function ProductCard({ product, addToCart }) {
   return (
     <div className="bg-white border rounded-2xl shadow hover:shadow-lg transition p-4 flex flex-col">
 
-      {/* รูปสินค้า */}
       <Link to={`/products/${product.id}`}>
         <img
           src={product.image_url}
           alt={product.name}
-          className="w-full h-52 object-cover rounded-xl"
+          className="w-full h-52 object-cover rounded-lg"
         />
       </Link>
 
-      {/* ชื่อ + น้ำหนัก — ทั้งคู่ตัวหนา */}
-      <h3 className="font-semibold text-lg text-gray-900 leading-snug mt-4 mb-3">
+      <h3 className="font-semibold text-base text-gray-900 leading-snug mt-3 mb-2">
         {product.name}{" "}
         <span className="font-semibold text-gray-900">{product.weight}</span>
       </h3>
 
-      {/* ราคา */}
-      <p className="text-red-600 font-bold text-xl mb-5">
+      <p className="text-red-600 font-bold text-lg mb-4">
         {product.price} ฿
       </p>
 
-      {/* ปุ่มตะกร้า */}
       <button
         onClick={() => addToCart(product)}
-        className="mt-auto w-full py-2.5 bg-red-600 text-white rounded-xl font-semibold shadow hover:shadow-lg active:scale-[0.97]"
+        className="mt-auto w-full py-2.5 bg-red-600 text-white rounded-lg font-semibold shadow hover:bg-red-700 transition"
       >
         🛒 เพิ่มลงตะกร้า
       </button>
