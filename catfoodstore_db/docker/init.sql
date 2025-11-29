@@ -1,5 +1,5 @@
 -- ===============================
--- ตารางอาหารแมว (แก้ไขแล้ว ใช้งานได้จริง)
+-- ตารางอาหารแมว (ใช้ special_care + age_group ใหม่)
 -- ===============================
 
 CREATE TABLE products (
@@ -9,12 +9,12 @@ CREATE TABLE products (
     price DECIMAL(10,2),
     weight VARCHAR(50),
 
-    age_group VARCHAR(20) 
-        CHECK (age_group IN ('kitten', 'adult', 'special_care')),
+    age_group VARCHAR(20)
+        CHECK (age_group IN ('newborn', 'kitten', 'adult', 'senior')),
 
     breed_type VARCHAR[] DEFAULT ARRAY['all'],
 
-    special_care VARCHAR[] DEFAULT ARRAY['all'],
+    special_care VARCHAR[] DEFAULT ARRAY['all'],   -- ✅ เปลี่ยนกลับมาเป็น special_care
 
     category VARCHAR(20) 
         CHECK (category IN ('dry', 'wet', 'snack')),
@@ -43,6 +43,11 @@ CREATE TRIGGER update_products_modtime
 BEFORE UPDATE ON products
 FOR EACH ROW
 EXECUTE FUNCTION update_modified_column();
+
+
+-- ===============================
+-- INSERT DATA (ใช้ special_care)
+-- ===============================
 
 INSERT INTO products 
 (name, description, price, weight, age_group, breed_type, special_care, category, stock, image_url)
@@ -114,7 +119,6 @@ VALUES
  'พลังงานสูง เสริมข้อต่อและหัวใจ เหมาะกับแมวตัวใหญ่',
  499, '2kg', 'adult', ARRAY['เมนคูน'], ARRAY['all'], 'dry', 30,
  'https://th-test-11.slatic.net/p/1879e104d61655504eba3d343d8003e4.jpg');
- 
 
 
 -- ===============================
@@ -126,10 +130,11 @@ CREATE TYPE user_role AS ENUM ('admin', 'customer');
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,            -- (DEV MODE) เก็บ plaintext
+    password VARCHAR(255) NOT NULL,
     role user_role NOT NULL DEFAULT 'customer',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
 
 -- ===============================
 -- ตัวอย่างข้อมูลผู้ใช้เริ่มต้น
@@ -139,3 +144,4 @@ INSERT INTO users (email, password, role)
 VALUES
 ('admin@example.com', 'admin123', 'admin'),
 ('user@example.com', 'user123', 'customer');
+

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";   // ⭐ เพิ่ม useLocation
 import axios from "axios";
 
 export default function ProductListPage() {
+  const location = useLocation(); // ⭐ อ่าน query string
+
   const [filters, setFilters] = useState({
     type: "",
     age: [],
-    health: [],
+    special_care: [],
     breed: [],
   });
 
@@ -15,21 +17,40 @@ export default function ProductListPage() {
   const [filtered, setFiltered] = useState([]);
   const [toast, setToast] = useState(null);
 
-  /* COLLAPSE STATES */
   const [openAge, setOpenAge] = useState(true);
   const [openHealth, setOpenHealth] = useState(true);
   const [openBreed, setOpenBreed] = useState(true);
+
+  /* ⭐ อ่านค่าจาก URL เช่น /products?breed=เปอร์เซีย */
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+
+    const breed = params.get("breed");
+    const age = params.get("age");
+    const special = params.get("special_care");
+
+    setFilters((prev) => ({
+      ...prev,
+      breed: breed ? [breed] : [],
+      age: age ? [age] : [],
+      special_care: special ? [special] : [],
+    }));
+  }, [location.search]);
 
   /* ===================== LOAD PRODUCTS ===================== */
   useEffect(() => {
     const load = async () => {
       try {
         const res = await axios.get("/api/products");
+
         const items = res.data.map((p) => ({
           ...p,
-          health: p.special_care || [],
-
+          special_care: (p.special_care || []).map((h) => h.toLowerCase()),
+          breed_type: (p.breed_type || []).map((b) =>
+            b === "all" ? "ทุกสายพันธุ์" : b
+          ),
         }));
+
         setAllProducts(items);
         setFiltered(items);
       } catch (e) {
@@ -47,6 +68,28 @@ export default function ProductListPage() {
     });
     return [...set].map((b) => ({ label: b, value: b }));
   }, [allProducts]);
+
+  /* ===================== DYNAMIC SPECIAL CARE OPTIONS ===================== */
+  const specialCareOptions = React.useMemo(() => {
+    const set = new Set();
+    allProducts.forEach((p) => {
+      (p.special_care || []).forEach((h) => {
+        if (h !== "all") set.add(h);
+      });
+    });
+
+    return [...set].map((h) => ({
+      label: h,
+      value: h,
+    }));
+  }, [allProducts]);
+
+  /* ===================== AGE OPTIONS ===================== */
+  const ageOptions = [
+    { label: "ลูกแมว", value: "kitten" },
+    { label: "แมวโต", value: "adult" },
+    { label: "แมวสูงอายุ", value: "senior" },
+  ];
 
   /* ===================== ADD TO CART ===================== */
   const addToCart = (product) => {
@@ -81,9 +124,9 @@ export default function ProductListPage() {
     if (filters.age.length)
       result = result.filter((p) => filters.age.includes(p.age_group));
 
-    if (filters.health.length)
+    if (filters.special_care.length)
       result = result.filter((p) =>
-        p.health.some((h) => filters.health.includes(h.toLowerCase()))
+        p.special_care.some((h) => filters.special_care.includes(h))
       );
 
     if (filters.breed.length)
@@ -106,7 +149,7 @@ export default function ProductListPage() {
   }, [filters, allProducts, sortBy]);
 
   const resetFilters = () =>
-    setFilters({ type: "", age: [], health: [], breed: [] });
+    setFilters({ type: "", age: [], special_care: [], breed: [] });
 
   /* ===================== UI ===================== */
 
@@ -121,15 +164,12 @@ export default function ProductListPage() {
         {filters.type === "snack" && "ขนมสำหรับแมว"}
       </h1>
 
-      {/* SUBTITLE ABOVE CATEGORY */}
       <p className="text-lg font-medium text-gray-700 mb-3">
         เลือกหมวดหมู่สินค้า
       </p>
 
-      {/* CATEGORY + COUNT + SORT */}
+      {/* CATEGORY + SORT */}
       <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
-
-        {/* LEFT — CATEGORY */}
         <div className="flex gap-4 flex-wrap">
           {[
             { label: "ทั้งหมด", value: "" },
@@ -154,7 +194,6 @@ export default function ProductListPage() {
           ))}
         </div>
 
-        {/* RIGHT — COUNT + SORT */}
         <div className="flex items-center gap-4">
           <p className="text-gray-600 font-medium whitespace-nowrap">
             พบ {filtered.length} รายการ
@@ -163,13 +202,12 @@ export default function ProductListPage() {
         </div>
       </div>
 
-      {/* MAIN GRID */}
+      {/* GRID */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
 
-        {/* LEFT SIDEBAR — FILTERS */}
+        {/* SIDEBAR */}
         <aside className="md:col-span-1 bg-white border rounded-xl shadow-sm p-6 h-fit">
 
-          {/* FILTER HEADER */}
           <div className="flex justify-between mb-4">
             <h2 className="text-xl font-bold">ตัวกรองสินค้า</h2>
             <button
@@ -185,11 +223,7 @@ export default function ProductListPage() {
           {/* AGE */}
           <Collapse title="ช่วงวัยแมว" open={openAge} setOpen={setOpenAge}>
             <FilterGroup
-              items={[
-                { label: "ลูกแมว", value: "kitten" },
-                { label: "แมวโต", value: "adult" },
-                { label: "สูตรดูแลพิเศษ", value: "special_care" },
-              ]}
+              items={ageOptions}
               selected={filters.age}
               toggle={(v) => toggleCheckbox("age", v)}
             />
@@ -197,22 +231,22 @@ export default function ProductListPage() {
 
           <div className="border-b my-4"></div>
 
-          {/* HEALTH */}
-          <Collapse title="สุขภาพเฉพาะทาง" open={openHealth} setOpen={setOpenHealth}>
+          {/* SPECIAL CARE */}
+          <Collapse
+            title="สุขภาพเฉพาะทาง"
+            open={openHealth}
+            setOpen={setOpenHealth}
+          >
             <FilterGroup
-              items={[
-                { label: "Urinary", value: "urinary" },
-                { label: "Hairball", value: "hairball" },
-                { label: "ควบคุมน้ำหนัก", value: "weight" },
-              ]}
-              selected={filters.health}
-              toggle={(v) => toggleCheckbox("health", v)}
+              items={specialCareOptions}
+              selected={filters.special_care}
+              toggle={(v) => toggleCheckbox("special_care", v)}
             />
           </Collapse>
 
           <div className="border-b my-4"></div>
 
-          {/* BREED — DYNAMIC FROM DATABASE */}
+          {/* BREED */}
           <Collapse title="สายพันธุ์แมว" open={openBreed} setOpen={setOpenBreed}>
             <FilterGroup
               items={breedOptions}
@@ -220,7 +254,6 @@ export default function ProductListPage() {
               toggle={(v) => toggleCheckbox("breed", v)}
             />
           </Collapse>
-
         </aside>
 
         {/* PRODUCT LIST */}
@@ -233,7 +266,6 @@ export default function ProductListPage() {
         </main>
       </div>
 
-      {/* TOAST */}
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-black/80 text-white px-5 py-3 rounded-xl shadow z-50">
           {toast}
@@ -243,7 +275,8 @@ export default function ProductListPage() {
   );
 }
 
-/* ===================== COLLAPSE ===================== */
+/* ========= COMPONENTS ========= */
+
 function Collapse({ title, open, setOpen, children }) {
   return (
     <div className="mb-4">
@@ -261,14 +294,13 @@ function Collapse({ title, open, setOpen, children }) {
   );
 }
 
-/* ===================== SORT DROPDOWN ===================== */
 function SortDropdown({ sortBy, setSortBy }) {
   return (
     <div className="relative">
       <select
         value={sortBy}
         onChange={(e) => setSortBy(e.target.value)}
-        className="px-4 py-2 pr-8 rounded-lg border shadow-sm bg-white appearance-none text-gray-700 font-medium"
+        className="px-4 py-2 pr-8 rounded-lg border shadow-sm bg-white text-gray-700 font-medium"
       >
         <option value="">จัดเรียงสินค้า</option>
         <option value="price_asc">ราคาน้อย → มาก</option>
@@ -280,7 +312,6 @@ function SortDropdown({ sortBy, setSortBy }) {
   );
 }
 
-/* ===================== FILTER GROUP ===================== */
 function FilterGroup({ items, selected, toggle }) {
   return (
     <div className="space-y-2">
@@ -299,11 +330,10 @@ function FilterGroup({ items, selected, toggle }) {
   );
 }
 
-/* ===================== PRODUCT CARD ===================== */
 function ProductCard({ product, addToCart }) {
   return (
     <div className="bg-white border rounded-2xl shadow hover:shadow-lg transition p-4 flex flex-col">
-      <Link to={`/product/${product.id}`}>
+      <Link to={`/products/${product.id}`}>
         <img
           src={product.image_url}
           alt={product.name}
@@ -315,6 +345,10 @@ function ProductCard({ product, addToCart }) {
         {product.name}
       </h3>
 
+      {/* ⭐ น้ำหนัก */}
+      <p className="text-gray-600 text-sm mb-1">{product.weight}</p>
+
+      {/* ราคา */}
       <p className="text-red-600 font-bold mb-4">{product.price} ฿</p>
 
       <button
@@ -326,3 +360,4 @@ function ProductCard({ product, addToCart }) {
     </div>
   );
 }
+

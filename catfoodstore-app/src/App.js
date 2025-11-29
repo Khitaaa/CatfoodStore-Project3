@@ -19,6 +19,8 @@ import LoginPage from "./pages/LoginPage";
 // Admin
 import AdminProductsPage from "./pages/AdminProductsPage";
 
+import ScrollToTop from "./components/ScrollToTop";
+
 function App() {
   return (
     <div className="App">
@@ -29,6 +31,8 @@ function App() {
       </div>
 
       <Navbar />
+
+      <ScrollToTop />   {/* ⭐ ทำให้ทุกหน้าเด้งขึ้นบนสุด */}
 
       <main className="main-content min-h-screen px-4 py-6">
         <Routes>

@@ -14,7 +14,7 @@ export default function HomePage() {
         const res = await axios.get("/api/products");
         const items = res.data;
 
-        // + badge: 5 รายการแรกเป็นสินค้าใหม่
+        // ⭐ mark badge ว่าสินค้าใหม่
         const enhanced = items.map((p, index) => ({
           ...p,
           badge: index < 5 ? "new" : null,
@@ -26,7 +26,7 @@ export default function HomePage() {
         const breedsMap = {};
         enhanced.forEach((p) => {
           (p.breed_type || []).forEach((breed) => {
-            if (breed === "all") return;
+            if (breed === "all") return; // ตัด ‘all’
             if (!breedsMap[breed]) breedsMap[breed] = [];
             breedsMap[breed].push(p);
           });
@@ -107,7 +107,7 @@ export default function HomePage() {
             {Object.keys(breedGroups).map((breed) => (
               <Link
                 key={breed}
-                to={`/products?breed=${breed}`}
+                to={`/products?breed=${breed}`}   // ⭐ ส่งค่า breed ไปให้หน้า Products
                 className="
                   relative h-60 rounded-3xl overflow-hidden shadow-lg
                   hover:shadow-2xl hover:scale-[1.03] transition-transform
@@ -153,7 +153,7 @@ function HomeSection({ title, subtitle, link, children }) {
   return (
     <section className="max-w-7xl mx-auto py-20 px-6">
 
-      {/* HEADER แบบเว็บระดับโลก */}
+      {/* HEADER */}
       <div className="mb-10">
         <div className="flex justify-between items-end">
           <div>
@@ -178,7 +178,6 @@ function HomeSection({ title, subtitle, link, children }) {
           )}
         </div>
 
-        {/* เส้นคั่นแบบหรู */}
         <div className="mt-4 h-[3px] w-20 bg-red-600 rounded-full"></div>
       </div>
 
@@ -202,7 +201,6 @@ function HorizontalScroll({ products, addToCart }) {
   return (
     <div className="relative group">
 
-      {/* LEFT ARROW */}
       <button
         onClick={() => scroll("left")}
         className="
@@ -215,7 +213,6 @@ function HorizontalScroll({ products, addToCart }) {
         ◀
       </button>
 
-      {/* SCROLL AREA */}
       <div
         ref={scrollRef}
         className="flex gap-6 overflow-x-auto pb-3 scroll-smooth no-scrollbar"
@@ -227,7 +224,6 @@ function HorizontalScroll({ products, addToCart }) {
         ))}
       </div>
 
-      {/* RIGHT ARROW */}
       <button
         onClick={() => scroll("right")}
         className="
@@ -252,9 +248,10 @@ function PremiumProductCard({ product, addToCart }) {
       className="
         bg-white border rounded-2xl shadow-sm 
         hover:shadow-xl transition overflow-hidden
+        h-full flex flex-col
       "
     >
-      <Link to={`/product/${product.id}`}>
+      <Link to={`/products/${product.id}`}>
         <div className="aspect-[4/3] w-full overflow-hidden">
           <img
             src={product.image_url}
@@ -264,13 +261,15 @@ function PremiumProductCard({ product, addToCart }) {
         </div>
       </Link>
 
-      <div className="p-4 flex flex-col">
-        <h3 className="font-semibold text-lg leading-snug min-h-[50px]">
+      <div className="p-4 flex flex-col flex-1">
+        {/* ชื่อสินค้า สูงเท่ากันทุกใบ */}
+        <h3 className="font-semibold text-lg leading-snug min-h-[60px]">
           {product.name}
         </h3>
 
         <p className="text-red-600 font-bold mb-3">{product.price} ฿</p>
 
+        {/* ดันปุ่มลงล่าง */}
         <button
           onClick={() => addToCart(product)}
           className="mt-auto w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
@@ -281,3 +280,4 @@ function PremiumProductCard({ product, addToCart }) {
     </div>
   );
 }
+
