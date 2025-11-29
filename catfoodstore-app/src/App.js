@@ -16,7 +16,7 @@ import CartPage from "./pages/CartPage";
 import ReceiptPage from "./pages/ReceiptPage";
 import LoginPage from "./pages/LoginPage";
 
-// ⭐ Admin Page
+// Admin
 import AdminProductsPage from "./pages/AdminProductsPage";
 
 function App() {
@@ -32,29 +32,35 @@ function App() {
 
       <main className="main-content min-h-screen px-4 py-6">
         <Routes>
-          {/* หน้าแรก */}
+
+          {/* Homepage */}
           <Route path="/" element={<HomePage />} />
 
-          {/* Dynamic Category */}
+          {/* Category */}
           <Route path="/category/:categoryName" element={<CategoryPage />} />
 
-          {/* Pages */}
+          {/* Static pages */}
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/guide" element={<GuidePage />} />
 
+          {/* Product listing */}
           <Route path="/products" element={<ProductPage />} />
-          <Route path="/product/:id" element={<ProductDetailPage />} />
-          
+
+          {/* ⭐ Product detail (ต้องตรงกับลิงก์ทั้งหมดในระบบ) */}
+          <Route path="/products/:id" element={<ProductDetailPage />} />
+
+          {/* Cart & Payment */}
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<ReceiptPage />} />
           <Route path="/login" element={<LoginPage />} />
 
-          {/* ⭐ Admin Route */}
+          {/* Admin */}
           <Route path="/admin/products" element={<AdminProductsPage />} />
 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
+
         </Routes>
       </main>
 

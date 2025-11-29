@@ -14,7 +14,7 @@ export default function ProductDetailPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/api/products/${id}`);
+        const res = await axios.get(`/api/products/${id}`);
 
         setProduct({
           ...res.data,
@@ -39,18 +39,6 @@ export default function ProductDetailPage() {
 
   const saveData = (key, data) => {
     localStorage.setItem(key, JSON.stringify(data));
-  };
-
-  /* FAVORITE */
-  const toggleFavorite = () => {
-    let updated;
-    if (favorites.includes(product.id)) {
-      updated = favorites.filter((f) => f !== product.id);
-    } else {
-      updated = [...favorites, product.id];
-    }
-    setFavorites(updated);
-    saveData("favorites", updated);
   };
 
   /* ADD TO CART */

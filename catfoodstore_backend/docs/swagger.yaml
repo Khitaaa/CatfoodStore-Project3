@@ -142,7 +142,7 @@ components:
         price:
           type: number
         weight:
-          type: number
+          type: string       # แก้จาก number → string
         age_group:
           type: string
         breed_type:
@@ -153,6 +153,8 @@ components:
           type: string
         image_url:
           type: string
+        stock:
+          type: integer      # เพิ่มใหม่
         created_at:
           type: string
         updated_at:
@@ -168,7 +170,7 @@ components:
         price:
           type: number
         weight:
-          type: number
+          type: string       # แก้ตรงนี้ด้วย
         age_group:
           type: string
         breed_type:
@@ -179,3 +181,5 @@ components:
           type: string
         image_url:
           type: string
+        stock:
+          type: integer      # เพิ่มใหม่

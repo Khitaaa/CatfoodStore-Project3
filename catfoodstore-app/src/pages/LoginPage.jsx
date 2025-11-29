@@ -18,15 +18,14 @@ export default function LoginPage() {
     }
 
     try {
-      // ⭐ เชื่อม backend โดยตรงผ่าน port 8080
-      const res = await axios.post("http://localhost:8080/api/login", {
+      // ⭐ ต้องผ่าน nginx เท่านั้น!
+      const res = await axios.post("/api/login", {
         email,
         password,
       });
 
       const { id, email: userEmail, role, token } = res.data;
 
-      // ⭐ เก็บ token ไว้ใช้กับ API อื่น ๆ
       localStorage.setItem("token", token);
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userEmail", userEmail);

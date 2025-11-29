@@ -53,7 +53,7 @@ const Navbar = () => {
     const products = JSON.parse(localStorage.getItem("products")) || [];
     products.forEach((p) => {
       if (p.name.toLowerCase().includes(searchText.toLowerCase())) {
-        results.push({ type: "product", label: p.name, path: `/product/${p.id}` });
+        results.push({ type: "product", label: p.name, path: `/products/${p.id}` });
       }
     });
 

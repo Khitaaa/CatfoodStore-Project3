@@ -26,7 +26,7 @@ export default function HomePage() {
         const breedsMap = {};
         enhanced.forEach((p) => {
           (p.breed_type || []).forEach((breed) => {
-            if (breed === "all") return; // ไม่เอา all
+            if (breed === "all") return;
             if (!breedsMap[breed]) breedsMap[breed] = [];
             breedsMap[breed].push(p);
           });
@@ -64,7 +64,7 @@ export default function HomePage() {
         className="pt-20 pb-28 px-6 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/catfood/images/canin2.jpg')" }}
       >
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center backdrop-blur-sm bg-white/10 p-6 rounded-2xl">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-10 items-center p-6 rounded-2xl">
 
           <div>
             <h1 className="text-5xl font-bold text-red-600 leading-tight">
@@ -88,28 +88,48 @@ export default function HomePage() {
       {/* ⭐ สินค้าใหม่ */}
       <HomeSection
         title="สินค้าใหม่ (New Arrivals)"
+        subtitle="เลือกสินค้าที่เพิ่งเข้ามาสำหรับแมวของคุณ"
         link="/products?new=true"
       >
         <HorizontalScroll products={products.slice(0, 5)} addToCart={addToCart} />
       </HomeSection>
 
       {/* ⭐ สินค้าแนะนำตามสายพันธุ์ */}
-        <HomeSection 
-          title="สินค้าแนะนำตามสายพันธุ์"
-          link="/products"
-        >
+      <HomeSection
+        title="สินค้าแนะนำตามสายพันธุ์"
+        subtitle="โภชนาการเฉพาะสำหรับแต่ละสายพันธุ์เพื่อสุขภาพที่ตรงจุด"
+        link="/products"
+      >
         {Object.keys(breedGroups).length === 0 ? (
           <p className="text-gray-500">ยังไม่มีสินค้าแยกตามสายพันธุ์</p>
         ) : (
-          Object.keys(breedGroups).map((breed) => (
-            <div key={breed} className="mb-10">
-              <h3 className="text-xl font-bold mb-4">{breed}</h3>
-              <HorizontalScroll
-                products={breedGroups[breed]}
-                addToCart={addToCart}
-              />
-            </div>
-          ))
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {Object.keys(breedGroups).map((breed) => (
+              <Link
+                key={breed}
+                to={`/products?breed=${breed}`}
+                className="
+                  relative h-60 rounded-3xl overflow-hidden shadow-lg
+                  hover:shadow-2xl hover:scale-[1.03] transition-transform
+                  bg-gray-200
+                "
+              >
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url('/catfood/breeds/${breed}.jpg')`,
+                  }}
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+
+                <div className="absolute bottom-4 left-4 text-white drop-shadow-xl">
+                  <h3 className="text-2xl font-bold capitalize">{breed}</h3>
+                  <p className="text-sm opacity-90">ดูสินค้า →</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         )}
       </HomeSection>
 
@@ -127,29 +147,45 @@ export default function HomePage() {
 }
 
 /* ----------------------------------------
-   SECTION WRAPPER
+   PREMIUM SECTION HEADER
 ---------------------------------------- */
-function HomeSection({ title, link, children }) {
+function HomeSection({ title, subtitle, link, children }) {
   return (
-    <section className="max-w-7xl mx-auto py-14 px-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-gray-900">{title}</h2>
+    <section className="max-w-7xl mx-auto py-20 px-6">
 
-        {link && (
-          <Link
-            to={link}
-            className="text-red-600 font-medium hover:underline"
-          >
-            ดูทั้งหมด →
-          </Link>
-        )}
+      {/* HEADER แบบเว็บระดับโลก */}
+      <div className="mb-10">
+        <div className="flex justify-between items-end">
+          <div>
+            <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+              {title}
+            </h2>
+
+            {subtitle && (
+              <p className="text-gray-500 text-lg mt-1">
+                {subtitle}
+              </p>
+            )}
+          </div>
+
+          {link && (
+            <Link
+              to={link}
+              className="text-red-600 font-semibold hover:underline text-lg"
+            >
+              ดูทั้งหมด →
+            </Link>
+          )}
+        </div>
+
+        {/* เส้นคั่นแบบหรู */}
+        <div className="mt-4 h-[3px] w-20 bg-red-600 rounded-full"></div>
       </div>
 
       {children}
     </section>
   );
 }
-
 
 /* ----------------------------------------
    Horizontal Scroll + Arrows
@@ -159,7 +195,7 @@ function HorizontalScroll({ products, addToCart }) {
 
   const scroll = (dir) => {
     if (!scrollRef.current) return;
-    const amount = dir === "left" ? -350 : 350;
+    const amount = dir === "left" ? -300 : 300;
     scrollRef.current.scrollBy({ left: amount, behavior: "smooth" });
   };
 
@@ -171,8 +207,8 @@ function HorizontalScroll({ products, addToCart }) {
         onClick={() => scroll("left")}
         className="
           absolute left-2 top-1/2 -translate-y-1/2 
-          bg-white/90 backdrop-blur shadow-lg 
-          p-2 rounded-full z-10 hover:bg-red-100 transition
+          bg-white shadow-lg 
+          p-3 rounded-full z-10 hover:bg-red-100 transition
           opacity-0 group-hover:opacity-100
         "
       >
@@ -182,13 +218,10 @@ function HorizontalScroll({ products, addToCart }) {
       {/* SCROLL AREA */}
       <div
         ref={scrollRef}
-        className="
-          flex gap-6 overflow-x-auto pb-4 scroll-smooth no-scrollbar 
-          px-2
-        "
+        className="flex gap-6 overflow-x-auto pb-3 scroll-smooth no-scrollbar"
       >
         {products.map((p) => (
-          <div key={p.id} className="min-w-[220px]">
+          <div key={p.id} className="w-[240px] flex-shrink-0">
             <PremiumProductCard product={p} addToCart={addToCart} />
           </div>
         ))}
@@ -199,8 +232,8 @@ function HorizontalScroll({ products, addToCart }) {
         onClick={() => scroll("right")}
         className="
           absolute right-2 top-1/2 -translate-y-1/2 
-          bg-white/90 backdrop-blur shadow-lg 
-          p-2 rounded-full z-10 hover:bg-red-100 transition
+          bg-white shadow-lg 
+          p-3 rounded-full z-10 hover:bg-red-100 transition
           opacity-0 group-hover:opacity-100
         "
       >
@@ -210,37 +243,33 @@ function HorizontalScroll({ products, addToCart }) {
   );
 }
 
-
 /* ----------------------------------------
    PRODUCT CARD
 ---------------------------------------- */
 function PremiumProductCard({ product, addToCart }) {
   return (
     <div
-      className="bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition"
+      className="
+        bg-white border rounded-2xl shadow-sm 
+        hover:shadow-xl transition overflow-hidden
+      "
     >
-      <div className="relative">
-        <Link to={`/product/${product.id}`}>
+      <Link to={`/product/${product.id}`}>
+        <div className="aspect-[4/3] w-full overflow-hidden">
           <img
             src={product.image_url}
-            className="w-full h-56 object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
             alt={product.name}
           />
-        </Link>
-
-        {product.badge && (
-          <span className="absolute top-3 left-3 bg-blue-500 text-white px-3 py-1 text-xs rounded-full">
-            ใหม่
-          </span>
-        )}
-      </div>
+        </div>
+      </Link>
 
       <div className="p-4 flex flex-col">
-        <h3 className="font-semibold text-lg leading-snug min-h-[48px]">
+        <h3 className="font-semibold text-lg leading-snug min-h-[50px]">
           {product.name}
         </h3>
 
-        <p className="text-red-600 font-bold mb-4">{product.price} ฿</p>
+        <p className="text-red-600 font-bold mb-3">{product.price} ฿</p>
 
         <button
           onClick={() => addToCart(product)}

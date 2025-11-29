@@ -174,7 +174,7 @@ export default function ProductListPage() {
               {filtered.map((p) => (
                 <Link
                   key={p.id}
-                  to={`/product/${p.id}`}
+                  to={`/products/${p.id}`}
                   className="bg-white border rounded-xl p-4 shadow-sm hover:shadow-lg transition"
                 >
                   <img
