@@ -18,7 +18,6 @@ export default function LoginPage() {
     }
 
     try {
-      // ⭐ ต้องผ่าน nginx เท่านั้น!
       const res = await axios.post("/api/login", {
         email,
         password,

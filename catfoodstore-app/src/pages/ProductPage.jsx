@@ -27,7 +27,8 @@ export default function ProductListPage() {
         const res = await axios.get("/api/products");
         const items = res.data.map((p) => ({
           ...p,
-          health: p.health || [],
+          health: p.special_care || [],
+
         }));
         setAllProducts(items);
         setFiltered(items);
@@ -37,6 +38,15 @@ export default function ProductListPage() {
     };
     load();
   }, []);
+
+  /* ===================== DYNAMIC BREED OPTIONS ===================== */
+  const breedOptions = React.useMemo(() => {
+    const set = new Set();
+    allProducts.forEach((p) => {
+      (p.breed_type || []).forEach((b) => set.add(b));
+    });
+    return [...set].map((b) => ({ label: b, value: b }));
+  }, [allProducts]);
 
   /* ===================== ADD TO CART ===================== */
   const addToCart = (product) => {
@@ -103,22 +113,21 @@ export default function ProductListPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
 
-      {/* TOP BAR — CATEGORY + COUNT + SORT (same row) */}
-{/* PAGE TITLE */}
-<h1 className="text-3xl font-bold text-gray-900 mb-6">
-  {filters.type === "" && "สินค้าทั้งหมด"}
-  {filters.type === "dry" && "อาหารเม็ดสำหรับแมว"}
-  {filters.type === "wet" && "อาหารเปียกสำหรับแมว"}
-  {filters.type === "snack" && "ขนมสำหรับแมว"}
-</h1>
+      {/* PAGE TITLE */}
+      <h1 className="text-3xl font-bold text-gray-900 mb-6">
+        {filters.type === "" && "สินค้าทั้งหมด"}
+        {filters.type === "dry" && "อาหารเม็ดสำหรับแมว"}
+        {filters.type === "wet" && "อาหารเปียกสำหรับแมว"}
+        {filters.type === "snack" && "ขนมสำหรับแมว"}
+      </h1>
 
-{/* SUBTITLE ABOVE CATEGORY */}
-<p className="text-lg font-medium text-gray-700 mb-3">
-  เลือกหมวดหมู่สินค้า
-</p>
+      {/* SUBTITLE ABOVE CATEGORY */}
+      <p className="text-lg font-medium text-gray-700 mb-3">
+        เลือกหมวดหมู่สินค้า
+      </p>
 
-{/* CATEGORY + COUNT + SORT */}
-<div className="flex flex-wrap justify-between items-center gap-4 mb-8">
+      {/* CATEGORY + COUNT + SORT */}
+      <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
 
         {/* LEFT — CATEGORY */}
         <div className="flex gap-4 flex-wrap">
@@ -203,13 +212,10 @@ export default function ProductListPage() {
 
           <div className="border-b my-4"></div>
 
-          {/* BREED */}
+          {/* BREED — DYNAMIC FROM DATABASE */}
           <Collapse title="สายพันธุ์แมว" open={openBreed} setOpen={setOpenBreed}>
             <FilterGroup
-              items={[
-                { label: "เปอร์เซีย", value: "เปอร์เซีย" },
-                { label: "บริติชช็อตแฮร์", value: "บริติชช็อตแฮร์" },
-              ]}
+              items={breedOptions}
               selected={filters.breed}
               toggle={(v) => toggleCheckbox("breed", v)}
             />
@@ -217,7 +223,7 @@ export default function ProductListPage() {
 
         </aside>
 
-        {/* RIGHT — PRODUCT LIST */}
+        {/* PRODUCT LIST */}
         <main className="md:col-span-3">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {filtered.map((item) => (
