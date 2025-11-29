@@ -17,7 +17,7 @@ services:
     build:
       context: ./catfoodstore_backend
       dockerfile: Dockerfile
-    container_name: catfoodfoodstore_backend
+    container_name: catfoodstore_backend
     env_file:
       - ./catfoodstore_backend/.env
     ports:
